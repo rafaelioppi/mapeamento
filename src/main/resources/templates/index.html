@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Mapeador de Sites</title>
+  <link rel="stylesheet" href="https://unpkg.com/mvp.css"/>
+</head>
+<body>
+<header>
+  <h1>Mapeador de Sites</h1>
+  <form method="post" th:action="@{/sites}">
+    <input type="url" name="url" placeholder="https://exemplo.com" required>
+    <button type="submit">Adicionar</button>
+  </form>
+</header>
+
+<main>
+  <table>
+    <thead>
+      <tr>
+        <th>URL</th>
+        <th>Status</th>
+        <th>Tempo (ms)</th>
+        <th>Última verificação</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="s : ${sites}">
+        <td th:text="${s.url}">URL</td>
+        <td th:text="${s.lastStatus}">Status</td>
+        <td th:text="${s.lastResponseMs}">Tempo</td>
+        <td th:text="${s.lastCheckedAt}">Data</td>
+        <td>
+          <form th:action="@{'/sites/' + ${s.id} + '/check'}" method="post" style="display:inline">
+            <button type="submit">Verificar</button>
+          </form>
+          <form th:action="@{'/sites/' + ${s.id} + '/delete'}" method="post" style="display:inline">
+            <button type="submit">Remover</button>
+          </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Caso não existam sites -->
+  <p th:if="${#lists.isEmpty(sites)}">Nenhum site cadastrado ainda.</p>
+</main>
+</body>
+</html>

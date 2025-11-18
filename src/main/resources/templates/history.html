@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Histórico - [[${site.url}]]</title>
+  <link rel="stylesheet" href="https://unpkg.com/mvp.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    canvas {
+      max-height: 400px;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Histórico de verificações</h1>
+  <p th:text="${site.url}"></p>
+  <a href="/">⬅ Voltar</a>
+</header>
+
+<main>
+  <h2>Tabela</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Status</th>
+        <th>Tempo (ms)</th>
+        <th>Data</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="c : ${checks}">
+        <td th:text="${c.statusCode}"></td>
+        <td th:text="${c.responseTimeMs}"></td>
+        <td th:text="${c.checkedAt}"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Gráfico de tempo de resposta</h2>
+  <canvas id="responseChart"></canvas>
+
+  <h2>Gráfico de status HTTP</h2>
+  <canvas id="statusChart"></canvas>
+</main>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  const labels = /*[[${labels}]]*/ [];
+  const responseTimes = /*[[${responseTimes}]]*/ [];
+  const statusCodes = /*[[${statusCodes}]]*/ [];
+
+  new Chart(document.getElementById('responseChart'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Tempo de resposta (ms)',
+        data: responseTimes,
+        borderColor: 'blue',
+        backgroundColor: 'rgba(0,0,255,0.1)',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { title: { display: true, text: 'ms' } },
+        x: { title: { display: true, text: 'Data' } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('statusChart'), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Status HTTP',
+        data: statusCodes,
+        backgroundColor: statusCodes.map(code => code === 200 ? 'green' : 'red')
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { title: { display: true, text: 'Código HTTP' } },
+        x: { title: { display: true, text: 'Data' } }
+      }
+    }
+  });
+  /*]]>*/
+</script>
+</body>
+</html>
